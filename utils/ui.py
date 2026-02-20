@@ -16,70 +16,27 @@ GRAY  = '#757575'
 
 # ── Global CSS ─────────────────────────────────────────────────────────────────
 _CSS = """
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
 <style>
-/* Base font */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap');
 html, body, [class*="css"], [data-testid], .stMarkdown, .stText,
 .stDataFrame, .stMetric, button, input, select, textarea {
     font-family: 'DM Sans', sans-serif !important;
 }
-
-/* White sidebar */
 section[data-testid="stSidebar"],
 section[data-testid="stSidebar"] > div:first-child {
     background-color: #FFFFFF !important;
     border-right: 1px solid #E0E0E0 !important;
 }
-
-/* Clean main bg */
 .stApp { background: #FFFFFF; }
 .block-container { padding-top: 1.5rem !important; }
-
-/* Typography */
-h1 { font-size: 24px !important; font-weight: 700 !important;
-     color: #1A1A1A !important; letter-spacing: -0.3px; }
+h1 { font-size: 24px !important; font-weight: 700 !important; color: #1A1A1A !important; letter-spacing: -0.3px; }
 h2 { font-size: 20px !important; font-weight: 600 !important; color: #1A1A1A !important; }
 h3 { font-size: 18px !important; font-weight: 500 !important; color: #1A1A1A !important; }
-
-/* Horizontal rule */
 hr { border: none; border-top: 1px solid #E0E0E0 !important; margin: 1.5rem 0; }
-
-/* Native st.metric: white card with thin border */
-[data-testid="stMetric"] {
-    background: #FAFAFA;
-    border: 1px solid #E0E0E0;
-    border-radius: 4px;
-    padding: 0.75rem 1rem;
-}
-
-/* Slider accent */
+[data-testid="stMetric"] { background: #FAFAFA; border: 1px solid #E0E0E0; border-radius: 4px; padding: 0.75rem 1rem; }
 [data-testid="stSlider"] > div > div > div > div { background-color: #06C167 !important; }
-
-/* Buttons */
-button[kind="secondary"], button[data-testid="baseButton-secondary"] {
-    border: 1px solid #E0E0E0 !important;
-    border-radius: 4px !important;
-    font-size: 13px !important;
-    font-weight: 500 !important;
-    color: #1A1A1A !important;
-    background: #FFFFFF !important;
-}
-button[kind="secondary"]:hover, button[data-testid="baseButton-secondary"]:hover {
-    border-color: #06C167 !important;
-    color: #06C167 !important;
-}
-
-/* Alert / info boxes */
 [data-testid="stAlert"] { border-radius: 4px !important; font-size: 13px !important; }
-
-/* Table header */
-.dvn-scroller thead th {
-    background-color: #F5F5F5 !important;
-    font-size: 12px !important;
-    font-weight: 600 !important;
-}
-
-/* Captions */
+.dvn-scroller thead th { background-color: #F5F5F5 !important; font-size: 12px !important; font-weight: 600 !important; }
 small, .stCaption { font-size: 12px !important; color: #757575 !important; }
 </style>
 """
