@@ -54,7 +54,17 @@ with c3:
     else:
         st.metric("Current Annual Revenue", "--")
 with c4:
-    st.metric("Projected Revenue Impact", "+$3.6M", delta="+2.9% trip growth")
+    if not df_scored.empty:
+        rev_delta  = df_scored['Revenue_Delta_Default'].sum()
+        new_trips  = df_scored['New_Trips_Default'].sum()
+        curr_trips = df_scored['Annualized Trips'].sum()
+        trip_pct   = (new_trips / curr_trips - 1) * 100
+        sign       = "+" if rev_delta >= 0 else ""
+        st.metric("Projected Revenue Impact",
+                  f"{sign}${rev_delta/1e6:.1f}M",
+                  delta=f"{sign}{trip_pct:.1f}% trip growth")
+    else:
+        st.metric("Projected Revenue Impact", "--")
 
 st.markdown("---")
 
