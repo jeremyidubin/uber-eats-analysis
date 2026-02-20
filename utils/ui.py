@@ -17,7 +17,7 @@ GRAY  = '#757575'
 # ── Global CSS ─────────────────────────────────────────────────────────────────
 _CSS = """
 <style>
-html, body, [class*="css"], [data-testid], .stMarkdown, .stText,
+html, body, [class*="css"], .stMarkdown, .stText,
 .stDataFrame, .stMetric, button, input, select, textarea {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif !important;
 }
