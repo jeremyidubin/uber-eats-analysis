@@ -9,26 +9,14 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from utils.data_loader import load_restaurant_data
 from utils.scoring import calculate_total_score
-from utils.ui import render_header, render_sidebar
+from utils.ui import render_header, render_sidebar, kpi_card, GREEN, RED, AMBER, DARK
 from utils.simulation import run_simulation, SS_DEFAULTS
 
-st.set_page_config(page_title="Fee Simulator", page_icon="💸", layout="wide")
+st.set_page_config(page_title="Fee Simulator", page_icon=None, layout="wide")
 render_header()
 render_sidebar()
 
-st.markdown("""
-<style>
-.metric-card {
-    background: linear-gradient(135deg, #142328 0%, #1e3a42 100%);
-    color: white; padding: 1.4rem 1.5rem; border-radius: 10px;
-    border-left: 5px solid #06C167; text-align: center;
-}
-.metric-card h2 { margin: 0; font-size: 2.2rem; }
-.metric-card p  { margin: 0; font-size: 0.85rem; opacity: 0.85; margin-top: 4px; }
-.positive { color: #06C167; }
-.negative { color: #e74c3c; }
-</style>
-""", unsafe_allow_html=True)
+TIER_COLORS = {'S': '#06C167', 'A': '#34A853', 'B': '#F9A825', 'C': '#D32F2F'}
 
 # ─── Data ────────────────────────────────────────────────────────────────────
 df_raw = load_restaurant_data()
@@ -39,144 +27,126 @@ if df_raw.empty:
 df = calculate_total_score(df_raw)
 
 # ─── Header ──────────────────────────────────────────────────────────────────
-st.title("💸 Fee Simulator")
-st.markdown("""
-Simulate how **tiered fee adjustments** and **Feed placement volume lifts** affect total marketplace revenue.
-Fee changes are relative (±pp from each merchant's current rate). Volume lifts reflect Feed algorithm changes, not fee elasticity.
-""")
-st.markdown("---")
+st.title("Fee Simulator")
+st.markdown(
+    "<p style='color:#757575; font-size:14px; margin-bottom:1.5rem;'>"
+    "Simulate tiered fee adjustments and Feed placement volume lifts. "
+    "Fee changes are relative to each merchant's current rate. "
+    "Volume changes reflect Feed algorithm shifts, not fee elasticity.</p>",
+    unsafe_allow_html=True,
+)
 
-# ─── TOP: SLIDERS ────────────────────────────────────────────────────────────
+# ─── Sliders ─────────────────────────────────────────────────────────────────
 reset_col, _ = st.columns([1, 5])
 with reset_col:
-    if st.button("🔄 Reset to Defaults", use_container_width=True):
-        # Delete keys so sliders reinitialise from their value= parameter on rerun
+    if st.button("Reset to defaults", use_container_width=True):
         for k in SS_DEFAULTS:
             st.session_state.pop(k, None)
         st.rerun()
 
-st.markdown("#### Fee Adjustments by Tier (percentage points, relative to current fee)")
+st.markdown(
+    "<p style='font-size:13px; font-weight:500; color:#1A1A1A; margin:0.5rem 0 0.3rem 0;'>"
+    "Fee adjustments by tier (percentage points, relative to current fee)</p>",
+    unsafe_allow_html=True,
+)
 fc1, fc2, fc3, fc4 = st.columns(4)
 
 with fc1:
-    st.markdown("**🏆 S-tier (top 10)**")
+    st.markdown("<p style='font-size:13px; font-weight:600; color:#06C167; margin:0;'>S-tier — top 10</p>", unsafe_allow_html=True)
     st.slider("S-tier fee change (%pt)", min_value=-5.0, max_value=5.0, step=0.1,
               value=SS_DEFAULTS['s_fee_change'], key='s_fee_change', format="%g%%",
-              help="Default: −2pp. Negative = fee reduction, positive = fee increase.")
+              help="Default: −2pp")
 with fc2:
-    st.markdown("**🥇 A-tier (rank 11–50)**")
+    st.markdown("<p style='font-size:13px; font-weight:600; color:#34A853; margin:0;'>A-tier — rank 11–50</p>", unsafe_allow_html=True)
     st.slider("A-tier fee change (%pt)", min_value=-5.0, max_value=5.0, step=0.1,
               value=SS_DEFAULTS['a_fee_change'], key='a_fee_change', format="%g%%",
-              help="Default: −0.5pp.")
+              help="Default: −0.5pp")
 with fc3:
-    st.markdown("**🥈 B-tier (rank 51–150)**")
+    st.markdown("<p style='font-size:13px; font-weight:600; color:#F9A825; margin:0;'>B-tier — rank 51–150</p>", unsafe_allow_html=True)
     st.slider("B-tier fee change (%pt)", min_value=-5.0, max_value=5.0, step=0.1,
               value=SS_DEFAULTS['b_fee_change'], key='b_fee_change', format="%g%%",
-              help="Default: +2pp.")
+              help="Default: +2pp")
 with fc4:
-    st.markdown("**🥉 C-tier (rank 151–200)**")
+    st.markdown("<p style='font-size:13px; font-weight:600; color:#D32F2F; margin:0;'>C-tier — rank 151–200</p>", unsafe_allow_html=True)
     st.slider("C-tier fee change (%pt)", min_value=-5.0, max_value=5.0, step=0.1,
               value=SS_DEFAULTS['c_fee_change'], key='c_fee_change', format="%g%%",
-              help="Default: +3pp.")
+              help="Default: +3pp")
 
-st.markdown("#### Volume Assumptions by Tier (Feed placement effect)")
+st.markdown(
+    "<p style='font-size:13px; font-weight:500; color:#1A1A1A; margin:0.8rem 0 0.3rem 0;'>"
+    "Volume assumptions by tier (Feed placement effect)</p>",
+    unsafe_allow_html=True,
+)
 vc1, vc2, vc3, vc4 = st.columns(4)
 
 with vc1:
     st.slider("S-tier volume change (%)", min_value=-40.0, max_value=40.0, step=1.0,
               value=SS_DEFAULTS['s_volume'], key='s_volume', format="%g%%",
-              help="Default: +20%. Reflects Feed placement boost, not fee elasticity.")
+              help="Default: +20%")
 with vc2:
     st.slider("A-tier volume change (%)", min_value=-40.0, max_value=40.0, step=1.0,
               value=SS_DEFAULTS['a_volume'], key='a_volume', format="%g%%",
-              help="Default: +10%.")
+              help="Default: +10%")
 with vc3:
     st.slider("B-tier volume change (%)", min_value=-40.0, max_value=40.0, step=1.0,
               value=SS_DEFAULTS['b_volume'], key='b_volume', format="%g%%",
-              help="Default: −5%.")
+              help="Default: −5%")
 with vc4:
     st.slider("C-tier volume change (%)", min_value=-40.0, max_value=40.0, step=1.0,
               value=SS_DEFAULTS['c_volume'], key='c_volume', format="%g%%",
-              help="Default: −15%.")
+              help="Default: −15%")
 
 st.markdown("---")
 
-# ─── CALCULATIONS ────────────────────────────────────────────────────────────
+# ─── Simulation ──────────────────────────────────────────────────────────────
 sim, tier_fee, tier_vol = run_simulation(df)
 
-# Column aliases expected by the rest of this page
 sim['Current Revenue'] = sim['Curr Rev']
 sim['Revenue Delta']   = sim['Rev Delta']
 sim['New Revenue']     = sim['New Rev']
 sim['Fee Change']      = sim['Fee Chg pp']
 sim['Fee Direction']   = sim['Fee Dir']
-sim['Fee Adj']         = sim['Fee Chg pp'] / 100
-sim['Vol Lift']        = sim['Vol Lift %'] / 100
 
 total_delta      = sim['Revenue Delta'].sum()
 total_curr_trips = sim['Annualized Trips'].sum()
 total_new_trips  = sim['New Trips'].sum()
 trip_change_pct  = (total_new_trips - total_curr_trips) / total_curr_trips * 100
 new_market_share = 0.18 * (1 + trip_change_pct / 100) * 100
-fee_increases    = len(sim[sim['Fee Chg pp'] > 0])
-fee_decreases    = len(sim[sim['Fee Chg pp'] < 0])
-
-# ─── FEE CAP/FLOOR WARNINGS ───────────────────────────────────────────────────
 n_capped  = int(sim['Fee Capped'].sum())
 n_floored = int(sim['Fee Floored'].sum())
+
+# Fee cap/floor warnings
 if n_capped > 0:
     st.warning(
         f"**{n_capped} merchant{'s' if n_capped > 1 else ''} capped at 30% maximum fee** — "
-        "their fee increase was truncated to stay within the case study limit."
+        "fee increase truncated to stay within the case study limit."
     )
 if n_floored > 0:
     st.warning(
         f"**{n_floored} merchant{'s' if n_floored > 1 else ''} floored at 10% minimum fee** — "
-        "their fee decrease was truncated to stay within the case study limit."
+        "fee decrease truncated to stay within the case study limit."
     )
 
-# ─── MIDDLE: KEY METRICS ─────────────────────────────────────────────────────
+# ─── Impact Summary ───────────────────────────────────────────────────────────
 st.markdown("### Impact Summary")
 
 m1, m2, m3, m4 = st.columns(4)
 
-delta_color = "positive" if total_delta >= 0 else "negative"
-delta_sign  = "+" if total_delta >= 0 else ""
-trip_sign   = "+" if trip_change_pct >= 0 else ""
-share_color = "positive" if new_market_share >= 18 else "negative"
+d_sign  = "+" if total_delta >= 0 else ""
+t_sign  = "+" if trip_change_pct >= 0 else ""
+d_color = GREEN if total_delta >= 0 else RED
+t_color = GREEN if trip_change_pct >= 0 else RED
+s_color = GREEN if new_market_share >= 18 else AMBER
+c_color = AMBER if (n_capped + n_floored) > 0 else GREEN
 
-with m1:
-    st.markdown(f"""
-    <div class="metric-card">
-        <h2 class="{delta_color}">{delta_sign}${total_delta/1e6:.2f}M</h2>
-        <p>Total Revenue Delta</p>
-    </div>""", unsafe_allow_html=True)
-
-with m2:
-    st.markdown(f"""
-    <div class="metric-card">
-        <h2 class="{'positive' if trip_change_pct >= 0 else 'negative'}">{trip_sign}{trip_change_pct:.1f}%</h2>
-        <p>Total Trip Change</p>
-    </div>""", unsafe_allow_html=True)
-
-with m3:
-    st.markdown(f"""
-    <div class="metric-card">
-        <h2 class="{share_color}">{new_market_share:.1f}%</h2>
-        <p>Est. New Market Share<br><small style="opacity:0.7">(baseline 18%)</small></p>
-    </div>""", unsafe_allow_html=True)
-
-with m4:
-    constraint_color = "#FFB800" if (n_capped + n_floored) > 0 else "#06C167"
-    st.markdown(f"""
-    <div class="metric-card">
-        <h2 style="color:{constraint_color};">{n_capped} cap / {n_floored} floor</h2>
-        <p>Merchants at Fee Bounds<br><small style="opacity:0.7">(30% cap · 10% floor)</small></p>
-    </div>""", unsafe_allow_html=True)
+kpi_card(m1, f"{d_sign}${total_delta/1e6:.2f}M", "Total revenue delta",         accent=d_color)
+kpi_card(m2, f"{t_sign}{trip_change_pct:.1f}%",   "Total trip change",           accent=t_color)
+kpi_card(m3, f"{new_market_share:.1f}%",           "Est. market share (base 18%)", accent=s_color)
+kpi_card(m4, f"{n_capped} cap / {n_floored} floor","Merchants at fee bounds",     accent=c_color)
 
 st.markdown("---")
 
-# ─── CHART 1: WATERFALL ──────────────────────────────────────────────────────
+# ─── Waterfall Chart ──────────────────────────────────────────────────────────
 st.markdown("### Revenue Waterfall by Tier")
 
 tier_deltas = sim.groupby('Tier')['Revenue Delta'].sum()
@@ -185,90 +155,83 @@ total_curr  = sim['Current Revenue'].sum()
 fig_wf = go.Figure(go.Waterfall(
     orientation='v',
     measure=['absolute', 'relative', 'relative', 'relative', 'relative', 'total'],
-    x=['Current\nRevenue', 'S-tier\nImpact', 'A-tier\nImpact',
-       'B-tier\nImpact', 'C-tier\nImpact', 'New\nRevenue'],
+    x=['Current\nRevenue', 'S-tier', 'A-tier', 'B-tier', 'C-tier', 'New\nRevenue'],
     y=[
         total_curr,
-        tier_deltas.get('S', 0),
-        tier_deltas.get('A', 0),
-        tier_deltas.get('B', 0),
-        tier_deltas.get('C', 0),
+        tier_deltas.get('S', 0), tier_deltas.get('A', 0),
+        tier_deltas.get('B', 0), tier_deltas.get('C', 0),
         total_curr + total_delta,
     ],
     text=[f"${v/1e6:.2f}M" for v in [
         total_curr,
-        tier_deltas.get('S', 0),
-        tier_deltas.get('A', 0),
-        tier_deltas.get('B', 0),
-        tier_deltas.get('C', 0),
+        tier_deltas.get('S', 0), tier_deltas.get('A', 0),
+        tier_deltas.get('B', 0), tier_deltas.get('C', 0),
         total_curr + total_delta,
     ]],
     textposition='outside',
-    increasing={'marker': {'color': '#06C167'}},
-    decreasing={'marker': {'color': '#e74c3c'}},
-    totals={'marker': {'color': '#3498db'}},
-    connector={'line': {'color': '#bbb', 'dash': 'dot'}},
+    increasing={'marker': {'color': GREEN}},
+    decreasing={'marker': {'color': RED}},
+    totals={'marker': {'color': DARK}},
+    connector={'line': {'color': '#BDBDBD', 'dash': 'dot'}},
 ))
 
 fig_wf.update_layout(
-    title='Revenue Impact Path: Current → New (by tier)',
-    yaxis=dict(title='Revenue ($)', gridcolor='#e0e0e0', tickformat='$,.0f'),
-    height=430,
-    plot_bgcolor='white',
-    paper_bgcolor='white',
+    yaxis=dict(title='Revenue ($)', gridcolor='#E0E0E0', griddash='dot', tickformat='$,.0f'),
+    height=420,
+    plot_bgcolor='white', paper_bgcolor='white',
+    font=dict(family='DM Sans, sans-serif', size=12, color=DARK),
     showlegend=False,
+    margin=dict(t=10, b=40, l=80, r=20),
 )
 
 st.plotly_chart(fig_wf, use_container_width=True, config={'displayModeBar': False})
 
-# ─── CHART 2: GROUPED BAR ────────────────────────────────────────────────────
+# ─── Current vs New Revenue ───────────────────────────────────────────────────
 st.markdown("### Current vs New Revenue by Tier")
 
 tier_rev = sim.groupby('Tier').agg(
     Current=('Current Revenue', 'sum'),
-    New=('New Revenue', 'sum')
+    New=('New Revenue', 'sum'),
 ).reindex(['S', 'A', 'B', 'C'])
 
 fig_bar = go.Figure()
 fig_bar.add_trace(go.Bar(
-    name='Current Revenue', x=tier_rev.index, y=tier_rev['Current'],
-    marker_color='#95a5a6',
+    name='Current', x=tier_rev.index, y=tier_rev['Current'],
+    marker_color='#BDBDBD',
     text=[f"${v/1e6:.1f}M" for v in tier_rev['Current']],
     textposition='outside',
 ))
 fig_bar.add_trace(go.Bar(
-    name='New Revenue', x=tier_rev.index, y=tier_rev['New'],
-    marker_color='#06C167',
+    name='Projected', x=tier_rev.index, y=tier_rev['New'],
+    marker_color=[TIER_COLORS[t] for t in tier_rev.index],
     text=[f"${v/1e6:.1f}M" for v in tier_rev['New']],
     textposition='outside',
 ))
 
 fig_bar.update_layout(
     barmode='group',
-    title='Revenue by Tier: Current vs Simulated',
-    xaxis_title='Tier', yaxis_title='Total Revenue ($)',
-    height=400,
+    xaxis_title='Tier',
+    yaxis=dict(title='Revenue ($)', gridcolor='#E0E0E0', griddash='dot', tickformat='$,.0f'),
+    height=380,
     plot_bgcolor='white', paper_bgcolor='white',
-    yaxis=dict(gridcolor='#e0e0e0', tickformat='$,.0f'),
+    font=dict(family='DM Sans, sans-serif', size=12, color=DARK),
     legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1),
+    margin=dict(t=10, b=40, l=80, r=20),
 )
 
 st.plotly_chart(fig_bar, use_container_width=True, config={'displayModeBar': False})
 
-# ─── CHART 3: SCATTER ────────────────────────────────────────────────────────
+# ─── Fee Scatter ──────────────────────────────────────────────────────────────
 st.markdown("### Current Fee vs Proposed Fee")
 
-tier_color_map = {'S': '#048A46', 'A': '#06C167', 'B': '#FF8F00', 'C': '#E53935'}
 fee_min = sim['Marketplace Fee'].min() * 0.95
 fee_max = max(sim['Marketplace Fee'].max(), sim['New Fee'].max()) * 1.05
 
 fig_sc = go.Figure()
-
-# No-change reference line
 fig_sc.add_trace(go.Scatter(
     x=[fee_min, fee_max], y=[fee_min, fee_max],
-    mode='lines', line=dict(color='#aaa', dash='dash', width=1.5),
-    name='No change', hoverinfo='skip'
+    mode='lines', line=dict(color='#BDBDBD', dash='dash', width=1.5),
+    name='No change', hoverinfo='skip',
 ))
 
 max_trips = sim['Annualized Trips'].max()
@@ -278,74 +241,76 @@ for tier in ['S', 'A', 'B', 'C']:
         x=t['Marketplace Fee'], y=t['New Fee'],
         mode='markers', name=f'Tier {tier}',
         marker=dict(
-            color=tier_color_map[tier],
+            color=TIER_COLORS[tier],
             size=(t['Annualized Trips'] / max_trips * 30 + 6),
-            opacity=0.8, line=dict(width=1, color='white')
+            opacity=0.8, line=dict(width=1, color='white'),
         ),
         text=t['Brand Name'],
         customdata=t[['Fee Change', 'Annualized Trips']].values,
         hovertemplate=(
-            '<b>%{text}</b><br>Current Fee: %{x:.1%}<br>'
-            'New Fee: %{y:.1%}<br>Change: %{customdata[0]:+.1f}pp<br>'
+            '<b>%{text}</b><br>Current: %{x:.1%}<br>'
+            'Proposed: %{y:.1%}<br>Change: %{customdata[0]:+.1f}pp<br>'
             'Trips: %{customdata[1]:,.0f}<extra></extra>'
-        )
+        ),
     ))
 
 fig_sc.add_annotation(
-    xref='paper', yref='paper', x=0.98, y=0.95,
-    text="Above line = fee increase ↑",
-    showarrow=False, font=dict(size=11, color='#e74c3c'), xanchor='right'
+    xref='paper', yref='paper', x=0.98, y=0.96,
+    text="Above line = fee increase",
+    showarrow=False, font=dict(size=11, color=RED), xanchor='right',
 )
 fig_sc.add_annotation(
-    xref='paper', yref='paper', x=0.98, y=0.88,
-    text="Below line = fee decrease ↓",
-    showarrow=False, font=dict(size=11, color='#06C167'), xanchor='right'
+    xref='paper', yref='paper', x=0.98, y=0.90,
+    text="Below line = fee decrease",
+    showarrow=False, font=dict(size=11, color=GREEN), xanchor='right',
 )
 
 fig_sc.update_layout(
-    title='Current Fee vs Proposed Fee (bubble size = annual trips)',
-    xaxis=dict(title='Current Marketplace Fee', tickformat='.1%', gridcolor='#e0e0e0'),
-    yaxis=dict(title='Proposed Fee', tickformat='.1%', gridcolor='#e0e0e0'),
-    height=500,
+    xaxis=dict(title='Current Marketplace Fee', tickformat='.1%', gridcolor='#E0E0E0', griddash='dot'),
+    yaxis=dict(title='Proposed Fee', tickformat='.1%', gridcolor='#E0E0E0', griddash='dot'),
+    height=480,
     plot_bgcolor='white', paper_bgcolor='white',
+    font=dict(family='DM Sans, sans-serif', size=12, color=DARK),
     legend=dict(title='Tier'),
+    margin=dict(t=10, b=40, l=80, r=20),
 )
 
+st.caption("Bubble size reflects annualized trip volume.")
 st.plotly_chart(fig_sc, use_container_width=True,
                 config={'displayModeBar': True, 'displaylogo': False})
 
-# ─── DETAIL TABLE ────────────────────────────────────────────────────────────
+# ─── Detail Table ─────────────────────────────────────────────────────────────
 st.markdown("---")
-with st.expander("📋 All 200 Merchants — Full Detail", expanded=False):
+with st.expander("All 200 merchants — detail table"):
 
     detail = sim.copy().sort_values('Revenue Delta', ascending=False)
 
     display = pd.DataFrame({
-        'Brand Name':     detail['Brand Name'],
-        'Segment':        detail['Segment'],
-        'Tier':           detail['Tier'],
-        'Curr Fee':       detail['Marketplace Fee'].apply(lambda x: f"{x:.1%}"),
-        'New Fee':        detail['New Fee'].apply(lambda x: f"{x:.1%}"),
-        'Fee Change':     detail['Fee Change'].apply(lambda x: f"{x:+.1f}pp"),
-        'Curr Trips':     detail['Annualized Trips'].apply(lambda x: f"{x:,.0f}"),
-        'New Trips':      detail['New Trips'].apply(lambda x: f"{x:,.0f}"),
-        'Curr Revenue':   detail['Current Revenue'].apply(lambda x: f"${x:,.0f}"),
-        'New Revenue':    detail['New Revenue'].apply(lambda x: f"${x:,.0f}"),
-        'Revenue Delta':  detail['Revenue Delta'].apply(lambda x: f"${x:+,.0f}"),
-        'Dir':            detail['Fee Direction'],
+        'Brand Name':    detail['Brand Name'],
+        'Segment':       detail['Segment'],
+        'Tier':          detail['Tier'],
+        'Curr Fee':      detail['Marketplace Fee'].apply(lambda x: f"{x:.1%}"),
+        'New Fee':       detail['New Fee'].apply(lambda x: f"{x:.1%}"),
+        'Fee Change':    detail['Fee Change'].apply(lambda x: f"{x:+.1f}pp"),
+        'Curr Trips':    detail['Annualized Trips'].apply(lambda x: f"{x:,.0f}"),
+        'New Trips':     detail['New Trips'].apply(lambda x: f"{x:,.0f}"),
+        'Curr Revenue':  detail['Current Revenue'].apply(lambda x: f"${x:,.0f}"),
+        'New Revenue':   detail['New Revenue'].apply(lambda x: f"${x:,.0f}"),
+        'Rev Delta':     detail['Revenue Delta'].apply(lambda x: f"${x:+,.0f}"),
+        'Dir':           detail['Fee Direction'],
     })
 
-    st.caption("Sorted by Revenue Delta (largest gain first)")
+    st.caption("Sorted by Revenue Delta — largest gain first")
     st.dataframe(display, use_container_width=True, hide_index=True, height=420)
 
     st.download_button(
-        label="📥 Download CSV",
+        label="Download CSV",
         data=sim[[
             'Brand Name', 'Segment', 'Tier',
             'Marketplace Fee', 'New Fee', 'Fee Change',
             'Annualized Trips', 'New Trips',
-            'Current Revenue', 'New Revenue', 'Revenue Delta', 'Fee Direction'
+            'Current Revenue', 'New Revenue', 'Revenue Delta', 'Fee Direction',
         ]].to_csv(index=False),
         file_name="fee_simulator_detail.csv",
-        mime="text/csv"
+        mime="text/csv",
     )
