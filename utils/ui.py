@@ -139,7 +139,6 @@ def _compute_sidebar_metrics():
 
 def render_sidebar():
     """Render a clean white sidebar with branding and live scenario metrics."""
-    inject_global_css()
     with st.sidebar:
         # ── Brand strip ───────────────────────────────────────────────────────
         st.markdown(
