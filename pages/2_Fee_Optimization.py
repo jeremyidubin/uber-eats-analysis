@@ -179,7 +179,7 @@ fig_wf.update_layout(
     yaxis=dict(title='Revenue ($)', gridcolor='#E0E0E0', griddash='dot', tickformat='$,.0f'),
     height=420,
     plot_bgcolor='white', paper_bgcolor='white',
-    font=dict(family='DM Sans, sans-serif', size=12, color=DARK),
+    font=dict(family='-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif', size=12, color=DARK),
     showlegend=False,
     margin=dict(t=10, b=40, l=80, r=20),
 )
@@ -214,7 +214,7 @@ fig_bar.update_layout(
     yaxis=dict(title='Revenue ($)', gridcolor='#E0E0E0', griddash='dot', tickformat='$,.0f'),
     height=380,
     plot_bgcolor='white', paper_bgcolor='white',
-    font=dict(family='DM Sans, sans-serif', size=12, color=DARK),
+    font=dict(family='-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif', size=12, color=DARK),
     legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1),
     margin=dict(t=10, b=40, l=80, r=20),
 )
@@ -270,7 +270,7 @@ fig_sc.update_layout(
     yaxis=dict(title='Proposed Fee', tickformat='.1%', gridcolor='#E0E0E0', griddash='dot'),
     height=480,
     plot_bgcolor='white', paper_bgcolor='white',
-    font=dict(family='DM Sans, sans-serif', size=12, color=DARK),
+    font=dict(family='-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif', size=12, color=DARK),
     legend=dict(title='Tier'),
     margin=dict(t=10, b=40, l=80, r=20),
 )

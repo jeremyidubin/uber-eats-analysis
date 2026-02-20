@@ -17,10 +17,9 @@ GRAY  = '#757575'
 # ── Global CSS ─────────────────────────────────────────────────────────────────
 _CSS = """
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap');
 html, body, [class*="css"], [data-testid], .stMarkdown, .stText,
 .stDataFrame, .stMetric, button, input, select, textarea {
-    font-family: 'DM Sans', sans-serif !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif !important;
 }
 section[data-testid="stSidebar"],
 section[data-testid="stSidebar"] > div:first-child {

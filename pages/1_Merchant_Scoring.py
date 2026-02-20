@@ -121,7 +121,7 @@ fig_hist.update_layout(
     plot_bgcolor='white',
     paper_bgcolor='white',
     bargap=0.05,
-    font=dict(family='DM Sans, sans-serif', size=12, color=DARK),
+    font=dict(family='-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif', size=12, color=DARK),
     xaxis=dict(gridcolor='#E0E0E0', griddash='dot', title='Total Score (0–100)'),
     yaxis=dict(gridcolor='#E0E0E0', griddash='dot', title='Merchants'),
     legend=dict(title='Tier', orientation='v'),
@@ -184,7 +184,7 @@ fig_bar.update_layout(
     height=480,
     plot_bgcolor='white',
     paper_bgcolor='white',
-    font=dict(family='DM Sans, sans-serif', size=12, color=DARK),
+    font=dict(family='-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif', size=12, color=DARK),
     legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1),
     margin=dict(t=10, b=40, l=180, r=20),
 )
