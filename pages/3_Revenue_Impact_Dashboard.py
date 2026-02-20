@@ -233,8 +233,12 @@ fig_sc.update_layout(
     legend=dict(title='Tier'),
     margin=dict(t=10, b=40, l=80, r=20),
 )
-st.plotly_chart(fig_sc, use_container_width=True,
-                config={'displayModeBar': True, 'displaylogo': False})
+st.caption("Double-click to reset zoom.")
+st.plotly_chart(fig_sc, use_container_width=True, config={
+    'displayModeBar': True,
+    'displaylogo': False,
+    'modeBarButtonsToRemove': ['select2d', 'lasso2d', 'autoScale2d', 'toggleSpikelines'],
+})
 
 st.markdown("---")
 

@@ -240,9 +240,12 @@ fig_sc.update_layout(
     margin=dict(t=10, b=40, l=80, r=20),
 )
 
-st.caption("Bubble size reflects annualized trip volume.")
-st.plotly_chart(fig_sc, use_container_width=True,
-                config={'displayModeBar': True, 'displaylogo': False})
+st.caption("Bubble size reflects annualized trip volume. Double-click to reset zoom.")
+st.plotly_chart(fig_sc, use_container_width=True, config={
+    'displayModeBar': True,
+    'displaylogo': False,
+    'modeBarButtonsToRemove': ['select2d', 'lasso2d', 'autoScale2d', 'toggleSpikelines'],
+})
 
 # ─── Detail Table ─────────────────────────────────────────────────────────────
 st.markdown("---")
