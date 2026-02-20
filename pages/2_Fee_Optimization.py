@@ -186,41 +186,6 @@ fig_wf.update_layout(
 
 st.plotly_chart(fig_wf, use_container_width=True, config={'displayModeBar': False})
 
-# ─── Current vs New Revenue ───────────────────────────────────────────────────
-st.markdown("### Current vs New Revenue by Tier")
-
-tier_rev = sim.groupby('Tier').agg(
-    Current=('Current Revenue', 'sum'),
-    New=('New Revenue', 'sum'),
-).reindex(['S', 'A', 'B', 'C'])
-
-fig_bar = go.Figure()
-fig_bar.add_trace(go.Bar(
-    name='Current', x=tier_rev.index, y=tier_rev['Current'],
-    marker_color='#BDBDBD',
-    text=[f"${v/1e6:.1f}M" for v in tier_rev['Current']],
-    textposition='outside',
-))
-fig_bar.add_trace(go.Bar(
-    name='Projected', x=tier_rev.index, y=tier_rev['New'],
-    marker_color=[TIER_COLORS[t] for t in tier_rev.index],
-    text=[f"${v/1e6:.1f}M" for v in tier_rev['New']],
-    textposition='outside',
-))
-
-fig_bar.update_layout(
-    barmode='group',
-    xaxis_title='Tier',
-    yaxis=dict(title='Revenue ($)', gridcolor='#E0E0E0', griddash='dot', tickformat='$,.0f'),
-    height=380,
-    plot_bgcolor='white', paper_bgcolor='white',
-    font=dict(family='-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif', size=12, color=DARK),
-    legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1),
-    margin=dict(t=10, b=40, l=80, r=20),
-)
-
-st.plotly_chart(fig_bar, use_container_width=True, config={'displayModeBar': False})
-
 # ─── Fee Scatter ──────────────────────────────────────────────────────────────
 st.markdown("### Current Fee vs Proposed Fee")
 

@@ -83,50 +83,6 @@ kpi_card(c5, f"${total_curr/1e6:.1f}M",           "Current total revenue",      
 st.markdown("")
 st.markdown("---")
 
-# ─── Revenue Waterfall ────────────────────────────────────────────────────────
-st.markdown("### Revenue Waterfall")
-
-tier_deltas = sim.groupby('Tier')['Rev Delta'].sum()
-
-fig_wf = go.Figure(go.Waterfall(
-    orientation='v',
-    measure=['absolute', 'relative', 'relative', 'relative', 'relative', 'total'],
-    x=['Current\nRevenue',
-       'S-tier\n(top 10)', 'A-tier\n(11–50)',
-       'B-tier\n(51–150)', 'C-tier\n(151–200)',
-       'Projected\nRevenue'],
-    y=[
-        total_curr,
-        tier_deltas.get('S', 0), tier_deltas.get('A', 0),
-        tier_deltas.get('B', 0), tier_deltas.get('C', 0),
-        total_new,
-    ],
-    text=[
-        f"${total_curr/1e6:.2f}M",
-        f"{'+' if tier_deltas.get('S',0)>=0 else ''}${tier_deltas.get('S',0)/1e6:.2f}M",
-        f"{'+' if tier_deltas.get('A',0)>=0 else ''}${tier_deltas.get('A',0)/1e6:.2f}M",
-        f"{'+' if tier_deltas.get('B',0)>=0 else ''}${tier_deltas.get('B',0)/1e6:.2f}M",
-        f"{'+' if tier_deltas.get('C',0)>=0 else ''}${tier_deltas.get('C',0)/1e6:.2f}M",
-        f"${total_new/1e6:.2f}M",
-    ],
-    textposition='outside',
-    increasing={'marker': {'color': GREEN}},
-    decreasing={'marker': {'color': RED}},
-    totals={'marker': {'color': DARK}},
-    connector={'line': {'color': '#BDBDBD', 'dash': 'dot'}},
-))
-
-fig_wf.update_layout(
-    yaxis=dict(title='Revenue ($)', gridcolor='#E0E0E0', griddash='dot', tickformat='$,.0f'),
-    height=440,
-    plot_bgcolor='white', paper_bgcolor='white',
-    font=dict(family='-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif', size=12, color=DARK),
-    showlegend=False,
-    margin=dict(t=10, b=40, l=80, r=20),
-)
-
-st.plotly_chart(fig_wf, use_container_width=True, config={'displayModeBar': False})
-
 # ─── Revenue by Tier ──────────────────────────────────────────────────────────
 tier_rev = sim.groupby('Tier').agg(
     Curr=('Curr Rev', 'sum'),
