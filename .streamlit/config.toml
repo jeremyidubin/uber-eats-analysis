@@ -1,0 +1,14 @@
+[theme]
+# Uber Eats brand colors
+primaryColor = "#06C167"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F0F2F6"
+textColor = "#262730"
+font = "sans serif"
+
+[server]
+headless = true
+port = 8501
+
+[browser]
+gatherUsageStats = false
