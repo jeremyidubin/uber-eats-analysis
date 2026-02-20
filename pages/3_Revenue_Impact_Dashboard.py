@@ -156,41 +156,47 @@ col_g, col_l = st.columns(2)
 
 with col_g:
     st.markdown("### Top 15 Gainers")
+    gain_max = top_gainers['Rev Delta'].max()
     fig_g = go.Figure(go.Bar(
-        y=top_gainers['Brand Name'].str[:22],
+        y=top_gainers['Brand Name'].str[:25],
         x=top_gainers['Rev Delta'],
         orientation='h',
         marker_color=GREEN,
         text=[f"${v/1e3:+.0f}K" for v in top_gainers['Rev Delta']],
         textposition='outside',
+        cliponaxis=False,
         hovertemplate='<b>%{y}</b><br>Delta: $%{x:,.0f}<extra></extra>',
     ))
     fig_g.update_layout(
-        xaxis=dict(title='Revenue Delta ($)', gridcolor='#E0E0E0', griddash='dot', tickformat='$,.0f'),
+        xaxis=dict(title='Revenue Delta ($)', gridcolor='#E0E0E0', griddash='dot',
+                   tickformat='$,.0f', range=[0, gain_max * 1.30]),
         yaxis=dict(autorange='reversed'),
         height=480, plot_bgcolor='white', paper_bgcolor='white',
         font=dict(family='-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif', size=12, color=DARK),
-        showlegend=False, margin=dict(t=10, b=40, l=160, r=60),
+        showlegend=False, margin=dict(t=10, b=40, l=170, r=20),
     )
     st.plotly_chart(fig_g, use_container_width=True, config={'displayModeBar': False})
 
 with col_l:
     st.markdown("### Top 15 Losers")
+    loss_min = top_losers['Rev Delta'].min()
     fig_l = go.Figure(go.Bar(
-        y=top_losers['Brand Name'].str[:22],
+        y=top_losers['Brand Name'].str[:25],
         x=top_losers['Rev Delta'],
         orientation='h',
         marker_color=RED,
         text=[f"${v/1e3:+.0f}K" for v in top_losers['Rev Delta']],
         textposition='outside',
+        cliponaxis=False,
         hovertemplate='<b>%{y}</b><br>Delta: $%{x:,.0f}<extra></extra>',
     ))
     fig_l.update_layout(
-        xaxis=dict(title='Revenue Delta ($)', gridcolor='#E0E0E0', griddash='dot', tickformat='$,.0f'),
+        xaxis=dict(title='Revenue Delta ($)', gridcolor='#E0E0E0', griddash='dot',
+                   tickformat='$,.0f', range=[loss_min * 1.30, 0]),
         yaxis=dict(autorange='reversed'),
         height=480, plot_bgcolor='white', paper_bgcolor='white',
         font=dict(family='-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif', size=12, color=DARK),
-        showlegend=False, margin=dict(t=10, b=40, l=160, r=60),
+        showlegend=False, margin=dict(t=10, b=40, l=170, r=20),
     )
     st.plotly_chart(fig_l, use_container_width=True, config={'displayModeBar': False})
 
