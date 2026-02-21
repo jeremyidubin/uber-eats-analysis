@@ -10,7 +10,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 from utils.data_loader import load_restaurant_data
 from utils.scoring import calculate_total_score
 from utils.ui import render_header, render_sidebar, kpi_card, GREEN, RED, AMBER, DARK
-from utils.simulation import run_simulation, SS_DEFAULTS
+from utils.simulation import run_simulation, SS_DEFAULTS, init_session_state
 
 st.set_page_config(page_title="Fee Simulator", page_icon=None, layout="wide")
 render_header()
@@ -37,6 +37,8 @@ st.markdown(
 )
 
 # ─── Sliders ─────────────────────────────────────────────────────────────────
+init_session_state()  # pre-populate keys so sliders read from session state, not value=
+
 reset_col, _ = st.columns([1, 5])
 with reset_col:
     if st.button("Reset to defaults", use_container_width=True):
@@ -54,23 +56,19 @@ fc1, fc2, fc3, fc4 = st.columns(4)
 with fc1:
     st.markdown("<p style='font-size:13px; font-weight:600; color:#06C167; margin:0;'>S-tier — top 10</p>", unsafe_allow_html=True)
     st.slider("S-tier fee change (%pt)", min_value=-5.0, max_value=5.0, step=0.1,
-              value=SS_DEFAULTS['s_fee_change'], key='s_fee_change', format="%g%%",
-              help="Default: −2pp")
+              key='s_fee_change', format="%g%%", help="Default: −2pp")
 with fc2:
     st.markdown("<p style='font-size:13px; font-weight:600; color:#34A853; margin:0;'>A-tier — rank 11–50</p>", unsafe_allow_html=True)
     st.slider("A-tier fee change (%pt)", min_value=-5.0, max_value=5.0, step=0.1,
-              value=SS_DEFAULTS['a_fee_change'], key='a_fee_change', format="%g%%",
-              help="Default: −0.5pp")
+              key='a_fee_change', format="%g%%", help="Default: −0.5pp")
 with fc3:
     st.markdown("<p style='font-size:13px; font-weight:600; color:#F9A825; margin:0;'>B-tier — rank 51–150</p>", unsafe_allow_html=True)
     st.slider("B-tier fee change (%pt)", min_value=-5.0, max_value=5.0, step=0.1,
-              value=SS_DEFAULTS['b_fee_change'], key='b_fee_change', format="%g%%",
-              help="Default: +2pp")
+              key='b_fee_change', format="%g%%", help="Default: +2pp")
 with fc4:
     st.markdown("<p style='font-size:13px; font-weight:600; color:#D32F2F; margin:0;'>C-tier — rank 151–200</p>", unsafe_allow_html=True)
     st.slider("C-tier fee change (%pt)", min_value=-5.0, max_value=5.0, step=0.1,
-              value=SS_DEFAULTS['c_fee_change'], key='c_fee_change', format="%g%%",
-              help="Default: +3pp")
+              key='c_fee_change', format="%g%%", help="Default: +3pp")
 
 st.markdown(
     "<p style='font-size:13px; font-weight:500; color:#1A1A1A; margin:0.8rem 0 0.3rem 0;'>"
@@ -81,20 +79,16 @@ vc1, vc2, vc3, vc4 = st.columns(4)
 
 with vc1:
     st.slider("S-tier volume change (%)", min_value=-40.0, max_value=40.0, step=1.0,
-              value=SS_DEFAULTS['s_volume'], key='s_volume', format="%g%%",
-              help="Default: +20%")
+              key='s_volume', format="%g%%", help="Default: +20%")
 with vc2:
     st.slider("A-tier volume change (%)", min_value=-40.0, max_value=40.0, step=1.0,
-              value=SS_DEFAULTS['a_volume'], key='a_volume', format="%g%%",
-              help="Default: +10%")
+              key='a_volume', format="%g%%", help="Default: +10%")
 with vc3:
     st.slider("B-tier volume change (%)", min_value=-40.0, max_value=40.0, step=1.0,
-              value=SS_DEFAULTS['b_volume'], key='b_volume', format="%g%%",
-              help="Default: −5%")
+              key='b_volume', format="%g%%", help="Default: −5%")
 with vc4:
     st.slider("C-tier volume change (%)", min_value=-40.0, max_value=40.0, step=1.0,
-              value=SS_DEFAULTS['c_volume'], key='c_volume', format="%g%%",
-              help="Default: −15%")
+              key='c_volume', format="%g%%", help="Default: −15%")
 
 st.markdown("---")
 
