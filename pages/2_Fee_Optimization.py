@@ -140,7 +140,7 @@ s_color = GREEN if new_market_share >= 18 else AMBER
 c_color = AMBER if (n_capped + n_floored) > 0 else GREEN
 
 kpi_card(m1, f"{d_sign}${total_delta/1e6:.2f}M", "Total revenue delta",         accent=d_color)
-kpi_card(m2, f"{t_sign}{trip_change_pct:.1f}%",   "Total trip change",           accent=t_color)
+kpi_card(m2, f"{t_sign}{trip_change_pct:.2f}%",   "Total trip change",           accent=t_color)
 kpi_card(m3, f"{new_market_share:.1f}%",           "Est. market share (base 18%)", accent=s_color)
 kpi_card(m4, f"{n_capped} cap / {n_floored} floor","Merchants at fee bounds",     accent=c_color)
 

@@ -76,7 +76,7 @@ s_color = GREEN if new_mkt_share >= 18 else AMBER
 
 kpi_card(c1, f"{sign}${total_delta/1e6:.2f}M",  "Total revenue delta",          accent=d_color)
 kpi_card(c2, f"${total_new/1e6:.1f}M",           "Projected total revenue")
-kpi_card(c3, f"{t_sign}{trip_chg_pct:.1f}%",     "Trip volume change",           accent=t_color)
+kpi_card(c3, f"{t_sign}{trip_chg_pct:.2f}%",     "Trip volume change",           accent=t_color)
 kpi_card(c4, f"{new_mkt_share:.1f}%",             "Est. market share (base 18%)", accent=s_color)
 kpi_card(c5, f"${total_curr/1e6:.1f}M",           "Current total revenue",        accent='#BDBDBD')
 
