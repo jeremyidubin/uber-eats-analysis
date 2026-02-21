@@ -37,13 +37,39 @@ st.markdown(
 )
 
 # ─── Sliders ─────────────────────────────────────────────────────────────────
-init_session_state()  # pre-populate keys so sliders read from session state, not value=
+# Shadow key pattern: widget keys (_widget_*) are owned by Streamlit and may be
+# cleared on page navigation. Shadow keys (s_fee_change, etc.) are plain session
+# state — never bound to a widget — so they survive navigation. run_simulation()
+# and the sidebar always read from shadow keys.
+init_session_state()  # ensure shadow keys exist with defaults
+
+# On each page load (including returns from navigation), re-seed widget keys
+# from shadow keys so sliders show the user's last-set values.
+for _wk, _sk in [
+    ('_widget_s_fee_change', 's_fee_change'),
+    ('_widget_a_fee_change', 'a_fee_change'),
+    ('_widget_b_fee_change', 'b_fee_change'),
+    ('_widget_c_fee_change', 'c_fee_change'),
+    ('_widget_s_volume',     's_volume'),
+    ('_widget_a_volume',     'a_volume'),
+    ('_widget_b_volume',     'b_volume'),
+    ('_widget_c_volume',     'c_volume'),
+]:
+    if _wk not in st.session_state:
+        st.session_state[_wk] = st.session_state[_sk]
+
+
+def _sync(shadow_key, widget_key):
+    """Copy current widget value into the corresponding shadow key."""
+    st.session_state[shadow_key] = st.session_state[widget_key]
+
 
 reset_col, _ = st.columns([1, 5])
 with reset_col:
     if st.button("Reset to defaults", use_container_width=True):
         for k in SS_DEFAULTS:
             st.session_state.pop(k, None)
+            st.session_state.pop(f'_widget_{k}', None)
         st.rerun()
 
 st.markdown(
@@ -56,19 +82,23 @@ fc1, fc2, fc3, fc4 = st.columns(4)
 with fc1:
     st.markdown("<p style='font-size:13px; font-weight:600; color:#06C167; margin:0;'>S-tier — top 10</p>", unsafe_allow_html=True)
     st.slider("S-tier fee change (%pt)", min_value=-5.0, max_value=5.0, step=0.1,
-              key='s_fee_change', format="%g%%", help="Default: −2pp")
+              key='_widget_s_fee_change', format="%g%%", help="Default: −2pp",
+              on_change=_sync, args=('s_fee_change', '_widget_s_fee_change'))
 with fc2:
     st.markdown("<p style='font-size:13px; font-weight:600; color:#34A853; margin:0;'>A-tier — rank 11–50</p>", unsafe_allow_html=True)
     st.slider("A-tier fee change (%pt)", min_value=-5.0, max_value=5.0, step=0.1,
-              key='a_fee_change', format="%g%%", help="Default: −0.5pp")
+              key='_widget_a_fee_change', format="%g%%", help="Default: −0.5pp",
+              on_change=_sync, args=('a_fee_change', '_widget_a_fee_change'))
 with fc3:
     st.markdown("<p style='font-size:13px; font-weight:600; color:#F9A825; margin:0;'>B-tier — rank 51–150</p>", unsafe_allow_html=True)
     st.slider("B-tier fee change (%pt)", min_value=-5.0, max_value=5.0, step=0.1,
-              key='b_fee_change', format="%g%%", help="Default: +2pp")
+              key='_widget_b_fee_change', format="%g%%", help="Default: +2pp",
+              on_change=_sync, args=('b_fee_change', '_widget_b_fee_change'))
 with fc4:
     st.markdown("<p style='font-size:13px; font-weight:600; color:#D32F2F; margin:0;'>C-tier — rank 151–200</p>", unsafe_allow_html=True)
     st.slider("C-tier fee change (%pt)", min_value=-5.0, max_value=5.0, step=0.1,
-              key='c_fee_change', format="%g%%", help="Default: +3pp")
+              key='_widget_c_fee_change', format="%g%%", help="Default: +3pp",
+              on_change=_sync, args=('c_fee_change', '_widget_c_fee_change'))
 
 st.markdown(
     "<p style='font-size:13px; font-weight:500; color:#1A1A1A; margin:0.8rem 0 0.3rem 0;'>"
@@ -79,16 +109,20 @@ vc1, vc2, vc3, vc4 = st.columns(4)
 
 with vc1:
     st.slider("S-tier volume change (%)", min_value=-40.0, max_value=40.0, step=1.0,
-              key='s_volume', format="%g%%", help="Default: +20%")
+              key='_widget_s_volume', format="%g%%", help="Default: +20%",
+              on_change=_sync, args=('s_volume', '_widget_s_volume'))
 with vc2:
     st.slider("A-tier volume change (%)", min_value=-40.0, max_value=40.0, step=1.0,
-              key='a_volume', format="%g%%", help="Default: +10%")
+              key='_widget_a_volume', format="%g%%", help="Default: +10%",
+              on_change=_sync, args=('a_volume', '_widget_a_volume'))
 with vc3:
     st.slider("B-tier volume change (%)", min_value=-40.0, max_value=40.0, step=1.0,
-              key='b_volume', format="%g%%", help="Default: −5%")
+              key='_widget_b_volume', format="%g%%", help="Default: −5%",
+              on_change=_sync, args=('b_volume', '_widget_b_volume'))
 with vc4:
     st.slider("C-tier volume change (%)", min_value=-40.0, max_value=40.0, step=1.0,
-              key='c_volume', format="%g%%", help="Default: −15%")
+              key='_widget_c_volume', format="%g%%", help="Default: −15%",
+              on_change=_sync, args=('c_volume', '_widget_c_volume'))
 
 st.markdown("---")
 
