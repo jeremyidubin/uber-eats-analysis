@@ -10,7 +10,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 from utils.data_loader import load_restaurant_data
 from utils.scoring import calculate_total_score
 from utils.ui import render_header, render_sidebar, kpi_card, GREEN, RED, AMBER, DARK
-from utils.simulation import run_simulation, is_at_defaults
+from utils.simulation import run_simulation, is_at_defaults, init_session_state
 
 st.set_page_config(page_title="Revenue Impact", page_icon=None, layout="wide")
 render_header()
@@ -19,6 +19,8 @@ render_sidebar()
 TIER_COLORS = {'S': '#06C167', 'A': '#34A853', 'B': '#F9A825', 'C': '#D32F2F'}
 
 # ─── Data & Simulation ────────────────────────────────────────────────────────
+init_session_state()   # ensure slider keys exist in session state before reading them
+
 df_raw = load_restaurant_data()
 if df_raw.empty:
     st.error("Unable to load data.")

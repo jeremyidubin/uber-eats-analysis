@@ -80,7 +80,8 @@ def _compute_sidebar_metrics():
     """Return (revenue_delta, market_share_pct) from current session state."""
     try:
         from utils.data_loader import load_restaurant_data
-        from utils.simulation import run_simulation
+        from utils.simulation import run_simulation, init_session_state
+        init_session_state()   # ensure keys exist before run_simulation reads them
         df  = load_restaurant_data()
         sim, _, _ = run_simulation(df)
         curr_trips   = sim['Annualized Trips'].sum()
@@ -91,6 +92,31 @@ def _compute_sidebar_metrics():
         return delta, mkt_share
     except Exception:
         return None, None
+
+
+def _sidebar_scenario_labels():
+    """Return (fee_line, vol_line) strings reflecting current session-state slider values."""
+    from utils.simulation import SS_DEFAULTS
+
+    def _pp(v):
+        return f"+{v:g}pp" if v >= 0 else f"{v:g}pp"
+
+    def _pct(v):
+        return f"+{v:g}%" if v >= 0 else f"{v:g}%"
+
+    ss = st.session_state
+    fs = ss.get('s_fee_change', SS_DEFAULTS['s_fee_change'])
+    fa = ss.get('a_fee_change', SS_DEFAULTS['a_fee_change'])
+    fb = ss.get('b_fee_change', SS_DEFAULTS['b_fee_change'])
+    fc = ss.get('c_fee_change', SS_DEFAULTS['c_fee_change'])
+    vs = ss.get('s_volume',     SS_DEFAULTS['s_volume'])
+    va = ss.get('a_volume',     SS_DEFAULTS['a_volume'])
+    vb = ss.get('b_volume',     SS_DEFAULTS['b_volume'])
+    vc = ss.get('c_volume',     SS_DEFAULTS['c_volume'])
+
+    fee_line = f"S {_pp(fs)} / A {_pp(fa)} / B {_pp(fb)} / C {_pp(fc)}"
+    vol_line = f"S {_pct(vs)} / A {_pct(va)} / B {_pct(vb)} / C {_pct(vc)}"
+    return fee_line, vol_line
 
 
 def render_sidebar():
@@ -110,6 +136,7 @@ def render_sidebar():
         if delta is not None:
             sign  = "+" if delta >= 0 else ""
             color = GREEN if delta >= 0 else RED
+            fee_line, vol_line = _sidebar_scenario_labels()
             st.markdown(
                 f"<div style='margin-bottom:1rem;'>"
                 f"<p style='font-size:11px; color:{GRAY}; margin:0 0 1px 0; text-transform:uppercase; letter-spacing:0.5px;'>Revenue Delta</p>"
@@ -121,8 +148,7 @@ def render_sidebar():
                 f"</div>"
                 f"<p style='font-size:11px; color:{GRAY}; margin:0.8rem 0 0 0;"
                 f"border-top:1px solid #E0E0E0; padding-top:0.6rem; line-height:1.8;'>"
-                f"S &minus;2pp / A &minus;0.5pp / B +2pp / C +3pp<br>"
-                f"S +20% / A +10% / B &minus;5% / C &minus;15%"
+                f"{fee_line}<br>{vol_line}"
                 f"</p>",
                 unsafe_allow_html=True,
             )
