@@ -11,7 +11,6 @@ from utils.data_loader import load_restaurant_data
 from utils.scoring import calculate_total_score, get_top_n_merchants
 from utils.ui import render_header, render_sidebar, kpi_card, GREEN, DARK
 
-st.set_page_config(page_title="Merchant Scoring", page_icon=None, layout="wide")
 render_header()
 render_sidebar()
 

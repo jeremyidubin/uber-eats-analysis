@@ -12,7 +12,6 @@ from utils.scoring import calculate_total_score
 from utils.ui import render_header, render_sidebar, kpi_card, GREEN, RED, AMBER, DARK
 from utils.simulation import run_simulation, SS_DEFAULTS, init_session_state
 
-st.set_page_config(page_title="Fee Simulator", page_icon=None, layout="wide")
 render_header()
 render_sidebar()
 

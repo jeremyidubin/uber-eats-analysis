@@ -6,7 +6,6 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from utils.ui import render_header, render_sidebar
 
-st.set_page_config(page_title="Methodology", page_icon=None, layout="wide")
 render_header()
 render_sidebar()
 
