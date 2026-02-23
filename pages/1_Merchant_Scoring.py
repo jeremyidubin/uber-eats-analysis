@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
-import plotly.express as px
 import sys
 from pathlib import Path
 
@@ -105,29 +104,45 @@ st.dataframe(
 st.markdown("---")
 st.markdown("### Score Distribution by Tier")
 
-fig_hist = px.histogram(
-    df_scored,
-    x='Total_Score',
-    color='Tier',
-    nbins=30,
-    color_discrete_map=TIER_COLORS,
-    category_orders={'Tier': ['S', 'A', 'B', 'C']},
-    labels={'Total_Score': 'Total Score (0–100)', 'count': 'Merchants'},
-)
+_tiers     = ['S', 'A', 'B', 'C']
+_vol_avgs  = [df_scored[df_scored['Tier'] == t]['Volume_Score'].mean()       for t in _tiers]
+_qual_avgs = [df_scored[df_scored['Tier'] == t]['Ops_Quality_Score'].mean()  for t in _tiers]
+_econ_avgs = [df_scored[df_scored['Tier'] == t]['Economics_Score'].mean()    for t in _tiers]
 
-fig_hist.update_layout(
+fig_dist = go.Figure()
+fig_dist.add_trace(go.Bar(
+    name='Volume (35)', x=_tiers, y=_vol_avgs,
+    marker_color='#3D9BE9',
+    text=[f'{v:.1f}' for v in _vol_avgs], textposition='outside',
+    hovertemplate='<b>Tier %{x}</b><br>Volume: %{y:.1f}/35<extra></extra>',
+))
+fig_dist.add_trace(go.Bar(
+    name='Quality (30)', x=_tiers, y=_qual_avgs,
+    marker_color='#F9A825',
+    text=[f'{v:.1f}' for v in _qual_avgs], textposition='outside',
+    hovertemplate='<b>Tier %{x}</b><br>Quality: %{y:.1f}/30<extra></extra>',
+))
+fig_dist.add_trace(go.Bar(
+    name='Economics (35)', x=_tiers, y=_econ_avgs,
+    marker_color=GREEN,
+    text=[f'{v:.1f}' for v in _econ_avgs], textposition='outside',
+    hovertemplate='<b>Tier %{x}</b><br>Economics: %{y:.1f}/35<extra></extra>',
+))
+fig_dist.update_layout(
+    barmode='group',
     height=360,
     plot_bgcolor='white',
     paper_bgcolor='white',
-    bargap=0.05,
     font=dict(family='-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif', size=12, color=DARK),
-    xaxis=dict(gridcolor='#E0E0E0', griddash='dot', title='Total Score (0–100)'),
-    yaxis=dict(gridcolor='#E0E0E0', griddash='dot', title='Merchants'),
-    legend=dict(title='Tier', orientation='v'),
-    margin=dict(t=10, b=40, l=50, r=20),
+    xaxis=dict(title='Tier', gridcolor='#E0E0E0', griddash='dot'),
+    yaxis=dict(title='Avg Score', gridcolor='#E0E0E0', griddash='dot', range=[0, 38]),
+    legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1),
+    margin=dict(t=30, b=40, l=50, r=20),
+    bargap=0.25,
+    bargroupgap=0.05,
 )
 
-st.plotly_chart(fig_hist, use_container_width=True, config={'displayModeBar': False})
+st.plotly_chart(fig_dist, use_container_width=True, config={'displayModeBar': False})
 
 # ─── Top 10 Score Breakdown ───────────────────────────────────────────────────
 st.markdown("---")
@@ -207,16 +222,13 @@ st.markdown("### Tier Summary")
 summary_rows = []
 for tier in ['S', 'A', 'B', 'C']:
     t = df_scored[df_scored['Tier'] == tier]
-    ent_pct = len(t[t['Segment'] == 'Enterprise']) / len(t) * 100 if len(t) else 0
     summary_rows.append({
-        'Tier':            tier,
-        'Count':           len(t),
-        'Avg Score':       round(t['Total_Score'].mean(), 1),
-        'Avg Trips':       f"{t['Annualized Trips'].mean():,.0f}",
-        'Avg Wait (min)':  round(t['Avg. Courier Wait Time (min)'].mean(), 2),
-        'Avg Defect Rate': f"{t['Order Defect Rate'].mean():.1%}",
-        'Avg Basket':      f"${t['Avg. Basket Size'].mean():.2f}",
-        'Enterprise %':    f"{ent_pct:.0f}%",
+        'Tier':               tier,
+        'Count':              len(t),
+        'Avg Score (100)':    round(t['Total_Score'].mean(), 1),
+        'Avg Volume (35)':    round(t['Volume_Score'].mean(), 1),
+        'Avg Quality (30)':   round(t['Ops_Quality_Score'].mean(), 1),
+        'Avg Economics (35)': round(t['Economics_Score'].mean(), 1),
     })
 
 st.dataframe(pd.DataFrame(summary_rows), use_container_width=True, hide_index=True)
